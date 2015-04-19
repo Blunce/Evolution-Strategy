@@ -10,8 +10,8 @@ import math
 import matplotlib.pyplot as plt
 
 PRECISION = 6
-FATHER, SON = 100, 100  # (FATHER + SON)
-ITERATE_NUM = 100
+FATHER, SON = 100, 125  # (FATHER + SON)
+ITERATE_NUM = 200
 RATE = 0.2  # 突变在子代中发生的概率
 
 def f(x1, x2):
@@ -132,7 +132,7 @@ def deleteAbnormal(dataSet):
         if dataSet[i][0] > 5 or dataSet[i][0] < -5 or dataSet[i][1] > 5 or dataSet[i][1] < -5:
             aim.append(i)
     aim = aim[::-1]
-    print aim
+    #print aim
     for item in aim:
         del dataSet[item]
     return dataSet
@@ -144,6 +144,42 @@ def NaturalSelection(dataSet):
     dataSet = dataSet[:FATHER][:]
     return encode(dataSet)
     
+def draw1(Y):
+    x = range(1, ITERATE_NUM + 1)
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
+    ax1.plot(x, Y[0], label='50:10')
+    ax1.plot(x, Y[1], label='50:30')
+    ax1.plot(x, Y[2], label='50:50')
+    ax1.plot(x, Y[3], label='50:80')
+    ax1.plot(x, Y[4], label='50:100')
+    ax1.legend(loc='best')
+    ax1.set_title('Rates of mu to sigma')
+    fig1.savefig("xuanzeya.jpg")
+    
+def draw2(Y):
+    x = range(1, ITERATE_NUM + 1)
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot(111)
+    ax2.plot(x, Y[0], label='0.2')
+    ax2.plot(x, Y[1], label='0.4')
+    ax2.plot(x, Y[2], label='0.6')
+    ax2.plot(x, Y[3], label='0.8')
+    ax2.legend(loc='best')
+    ax2.set_title("Mutation Rate")
+    fig2.savefig('bianyilv.jpg')
+    
+def draw3(Y):
+    x = range(1, ITERATE_NUM + 1)
+    fig3 = plt.figure()
+    ax3 = fig3.add_subplot(111)
+    ax3.plot(x, Y[0], label='10:12')
+    ax3.plot(x, Y[1], label='50:62')
+    ax3.plot(x, Y[2], label='100:125')
+    ax3.plot(x, Y[3], label='150:187')
+    ax3.legend(loc='best')
+    ax3.set_title('Scale of people')
+    fig3.savefig('zhongqunguimo.jpg')
 
 def Label(dataSet):
     # 用平均值和标准差表示变化
@@ -151,23 +187,63 @@ def Label(dataSet):
     dataSet = decode(dataSet)
     dataSet = np.array(dataSet)
     dataSet = dataSet[:][2]
-    return  np.mean(dataSet)   ,np.std(dataSet)
+    return  np.mean(dataSet)  # ,np.std(dataSet)
 
     
 if __name__ == '__main__':
-    dataSet = encode(InitialGen())
-    y = []
-    for i in range(ITERATE_NUM):
-        print i
-        dataSet = produceNextGen(dataSet)
-        dataSet = NaturalSelection(dataSet)
-        y.append(Label(dataSet))
-        
+    urRate = [[50, 10],
+              [50, 30],
+              [50, 50],
+              [50, 80],
+              [50, 100], ]
+    mutationRate = [0.2, 0.4, 0.6, 0.8]
+    uRate = [[10, 12],
+             [50, 62],
+             [100, 125],
+             [150, 187], ]
     
-    x = range(1, ITERATE_NUM + 1)
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.plot(x, y)
-    print 'save result'
-    fig.savefig('result.jpg')
-    print 'end'
+    Y = []
+    print "选择压试验 start"
+    for a, b in urRate:
+        FATHER, SON = a, b
+        dataSet = encode(InitialGen())
+        y = []
+        for i in range(ITERATE_NUM):
+            dataSet = produceNextGen(dataSet)
+            dataSet = NaturalSelection(dataSet)
+            y.append(Label(dataSet))
+        Y.append(y)
+    
+    draw1(Y)
+    print "选择压试验 end"
+
+    FATHER, SON = 100, 125 
+    print "变异率试验 start"
+    Y = []
+    for item in mutationRate:
+        RATE = item
+        dataSet = encode(InitialGen())
+        y = []
+        for i in range(ITERATE_NUM):
+            dataSet = produceNextGen(dataSet)
+            dataSet = NaturalSelection(dataSet)
+            y.append(Label(dataSet))
+        Y.append(y)
+    draw2(Y)
+    print "变异率试验 end"
+    
+    RATE = 0.2
+    print "种群规模试验 start"
+    Y = []
+    for a, b in uRate:
+        FATHER, SON = a, b
+        dataSet = encode(InitialGen())
+        y = []
+        for i in range(ITERATE_NUM):
+            dataSet = produceNextGen(dataSet)
+            dataSet = NaturalSelection(dataSet)
+            y.append(Label(dataSet))
+        Y.append(y)
+    draw3(Y)
+    print "种群规模试验 end"
+    
