@@ -15,7 +15,7 @@ ITERATE_NUM = 200
 RATE = 0.2  # 突变在子代中发生的概率
 
 def f(x1, x2):
-    return (x2 - 5.1 / (4 * math.pi ** 2) * x1 ** 2 + 5 * x1 / math.pi - 6) ** 2 + 10.0 * (1 - 1 / math.pi) * math.cos(x1) + 10.0
+    return (x2 - 5.1 / (4 * math.pi ** 2) * x1 ** 2 + 5 * x1 / math.pi - 6) ** 2 + 10.0 * (1 - 1 / (math.pi * 8)) * math.cos(x1) + 10.0
 
 def numToStr(x, y):
     # 返回字符串
@@ -132,7 +132,7 @@ def deleteAbnormal(dataSet):
         if dataSet[i][0] > 5 or dataSet[i][0] < -5 or dataSet[i][1] > 5 or dataSet[i][1] < -5:
             aim.append(i)
     aim = aim[::-1]
-    #print aim
+    # print aim
     for item in aim:
         del dataSet[item]
     return dataSet
@@ -155,7 +155,7 @@ def draw1(Y):
     ax1.plot(x, Y[4], label='50:100')
     ax1.legend(loc='best')
     ax1.set_title('Rates of mu to sigma')
-    fig1.savefig("xuanzeya.jpg")
+    fig1.savefig("xuanzeya.pdf")
     
 def draw2(Y):
     x = range(1, ITERATE_NUM + 1)
@@ -167,7 +167,7 @@ def draw2(Y):
     ax2.plot(x, Y[3], label='0.8')
     ax2.legend(loc='best')
     ax2.set_title("Mutation Rate")
-    fig2.savefig('bianyilv.jpg')
+    fig2.savefig('bianyilv.pdf')
     
 def draw3(Y):
     x = range(1, ITERATE_NUM + 1)
@@ -179,18 +179,19 @@ def draw3(Y):
     ax3.plot(x, Y[3], label='150:187')
     ax3.legend(loc='best')
     ax3.set_title('Scale of people')
-    fig3.savefig('zhongqunguimo.jpg')
+    fig3.savefig('zhongqunguimo.pdf')
 
 def Label(dataSet):
     # 用平均值和标准差表示变化
     import numpy as np 
     dataSet = decode(dataSet)
     dataSet = np.array(dataSet)
-    dataSet = dataSet[:][2]
+    dataSet = dataSet[:, 2]
     return  np.mean(dataSet)  # ,np.std(dataSet)
 
     
 if __name__ == '__main__':
+    aim = []
     urRate = [[50, 10],
               [50, 30],
               [50, 50],
@@ -244,6 +245,12 @@ if __name__ == '__main__':
             dataSet = NaturalSelection(dataSet)
             y.append(Label(dataSet))
         Y.append(y)
+        aim = dataSet
     draw3(Y)
     print "种群规模试验 end"
+    
+    with open('result.txt', 'w') as fw:
+        for item in decode(aim):
+            fw.write(str(item) + '\n')
+        
     
